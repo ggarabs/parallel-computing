@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdbool.h>
 
 int main(){
 	int pipefds1[2], pipefds2[2], pipefds3[2];
@@ -33,7 +34,8 @@ int main(){
 	pid = fork();
 
 	if(pid){
-		char word[200], reversed[200], palindromeCheck;
+		char word[200], reversed[200];
+		bool palindromeCheck;
 
 		close(pipefds1[0]);
 		close(pipefds2[1]);
@@ -52,7 +54,7 @@ int main(){
 		read(pipefds3[0], &palindromeCheck, sizeof(palindromeCheck));
 		close(pipefds3[0]);
 
-		if(palindromeCheck == 'S') printf("É palindromo!\n");
+		if(palindromeCheck) printf("É palindromo!\n");
 		else printf("Não é palíndromo!\n");
 
 	}else if(pid == 0){
@@ -74,10 +76,10 @@ int main(){
 		write(pipefds2[1], msg, strlen(msg) + 1);
 		close(pipefds2[1]);
 
-		char eh_palindromo = 'S';
+		bool eh_palindromo = true;
 
 		for(int i = 0; i < len/2; i++){
-			if(msg[i] != msg[len-1-i]) eh_palindromo = 'N';
+			if(msg[i] != msg[len-1-i]) eh_palindromo = false;
 		}
 
 		write(pipefds3[1], &eh_palindromo, sizeof(eh_palindromo));
